@@ -1,0 +1,628 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blip V0.01</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background: #f2f2f2;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: white;
+      font-weight: bold;
+      font-size: 24px;
+    }
+
+    .rings, .stories {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      overflow-x: auto;
+      background: white;
+    }
+.meta strong {
+  display: flex;
+  align-items: center;
+}
+
+.meta strong img.verified-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+    .story-ring, .story {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .story img, .story-ring img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .story-ring.blue { border: 3px solid #1877f2; }
+    .story-ring.red { border: 3px solid red; }
+    .story-ring.orange { border: 3px solid orange; }
+    .story-ring.purple { border: 3px solid purple; }
+
+    .story .username {
+      position: absolute;
+      bottom: -20px;
+      font-size: 12px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .new-post {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background: white;
+    }
+
+    .new-post input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .new-post button {
+      padding: 10px;
+      background: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .feed {
+      padding: 10px;
+    }
+
+    .post {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .post img.post-img {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .meta img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 14px;
+      color: gray;
+    }
+
+    .like-btn {
+      cursor: pointer;
+      color: gray;
+    }
+
+    .like-btn.liked {
+      color: red;
+    }
+
+    .comment-btn {
+      cursor: pointer;
+      color: #1877f2;
+      margin-left: 10px;
+    }
+
+    .follow-btn, #logoutBtn {
+      margin: 10px 0;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .follow-btn {
+      background: #1877f2;
+      color: white;
+    }
+
+    #logoutBtn {
+      background: red;
+      color: white;
+      font-size: 14px;
+    }
+
+    #picPreview {
+      max-width: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .page { display: none; }
+    
+    #profileEditor {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 999;
+      width: 80%;
+      max-width: 400px;
+    }
+    
+    #profileEditor input,
+    #profileEditor textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 998;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span>☰</span> Blip
+    <div>
+      <span id="user-pic" onclick="openEditor()" style="cursor:pointer;"></span>
+      <button id="logoutBtn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="rings" id="storyRings"></div>
+  <div class="stories" id="stories"></div>
+
+  <!-- Upload Story -->
+  
+  <!-- Profile Editor Modal -->
+  <div class="overlay" id="editorOverlay"></div>
+  <div id="profileEditor">
+    <h2>Edit Profile</h2>
+    <input id="editName" type="text" placeholder="Username">
+    <textarea id="editBio" placeholder="Bio"></textarea>
+    <input type="file" id="editPic" accept="image/*"><br><br>
+    <button onclick="saveProfileEdits()">Save</button>
+    <button onclick="closeEditor()">Cancel</button>
+  </div>
+
+  <!-- Create Post -->
+  <div class="new-post">
+    <input id="postInput" placeholder="What's on your mind?" type="text">
+    
+    <button onclick="createPost()">Post</button>
+  </div>
+
+  <div class="feed" id="feed"></div>
+
+  <!-- Profile Page -->
+  <div class="page" id="profilePage" style="padding: 20px;">
+    <span onclick="closeProfile()" style="cursor:pointer; font-size:18px;">← Back</span>
+    <h2 id="profileName"></h2>
+    <p id="profileBio"></p>
+    <p><span id="followerCount">0</span> Followers</p>
+    <button id="followBtn" class="follow-btn" onclick="toggleFollow()">Follow</button>
+    <div id="profilePosts"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAe0j-iB4gapzSq1zy2a6j4kwaET8JXZ_8",
+      authDomain: "nopeeking-e272a.firebaseapp.com",
+      databaseURL: "https://nopeeking-e272a-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "nopeeking-e272a",
+      storageBucket: "nopeeking-e272a.appspot.com",
+      messagingSenderId: "193204663242",
+      appId: "1:193204663242:web:46523ab13715b022b09533"
+    };
+  
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const storage = firebase.storage();
+    const verifiedUsers = {
+  "wQv32fQ848d2QOYWFl0JcJcLHmZ2": true,
+  "UID2": true
+};
+const verifiedBadge = '<img src="" style="width:14px;margin-left:-5px;margin-top:-5px;position:absolute;" title="Verified">';
+
+    let currentUser = null;
+    let viewingUID = null;
+  
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        db.ref("users/" + user.uid).once("value", snap => {
+          if (!snap.exists()) {
+            const name = prompt("Pick your username:");
+            const defaultPic = user.photoURL || "https://via.placeholder.com/40?text=👤";
+            if (name) {
+              db.ref("users/" + user.uid).set({
+                name,
+                bio: "",
+                pic: defaultPic
+              });
+            }
+          }
+        });
+  
+        const profilePic = user.photoURL || "https://via.placeholder.com/30?text=👤";
+        document.getElementById("user-pic").innerHTML = `<img src="${profilePic}" style="width:30px; height:30px; border-radius:50%">`;
+  
+        loadPosts();
+        loadStories();
+        loadStoryRings();
+        cleanupOldStories();
+      } else {
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      }
+    });
+  
+    function logout() {
+      auth.signOut().then(() => location.reload());
+    }
+  
+    function createPost() {
+      const text = document.getElementById("postInput").value;
+      const file = document.getElementById("postImage").files[0];
+      if (!text && !file) return;
+  
+      db.ref("users/" + currentUser.uid).once("value").then(snap => {
+        const user = snap.val() || {};
+        const postData = {
+          uid: currentUser.uid,
+          name: user.name || currentUser.displayName || "Anonymous",
+          pic: user.pic || currentUser.photoURL || "https://via.placeholder.com/40?text=👤",
+          text,
+          timestamp: Date.now(),
+          likes: 0,
+          comments: 0
+        };
+  
+        if (file) {
+          const storageRef = storage.ref("postImages/" + Date.now() + "_" + file.name);
+          storageRef.put(file)
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(url => {
+              postData.imageUrl = url;
+              db.ref("posts").push(postData);
+              document.getElementById("postInput").value = "";
+              document.getElementById("postImage").value = "";
+            });
+        } else {
+          db.ref("posts").push(postData);
+          document.getElementById("postInput").value = "";
+        }
+      });
+    }
+  
+    function loadPosts() {
+      db.ref("posts").on("value", snap => {
+        const feed = document.getElementById("feed");
+        feed.innerHTML = "";
+        const data = snap.val();
+        if (!data) return;
+        const sorted = Object.entries(data).sort((a, b) => b[1].timestamp - a[1].timestamp);
+        sorted.forEach(([id, post]) => {
+          db.ref("likes/" + id + "/" + currentUser.uid).once("value", snap => {
+            const liked = snap.exists() ? "liked" : "";
+            const imgHtml = post.imageUrl ? `<img class="post-img" src="${post.imageUrl}" />` : "";
+            const userPic = post.pic || "https://via.placeholder.com/40?text=👤";
+            feed.innerHTML += `
+              <div class="post">
+                <div class="meta">
+                  <img src="${userPic}" onclick="viewUserProfile('${post.uid}')">
+                  <strong>${post.name}</strong>
+                </div>
+                <div>${post.text}</div>
+                ${imgHtml}
+                <div class="stats">
+                  <span class="like-btn ${liked}" onclick="toggleLike('${id}')">♥</span>
+                  <span class="comment-btn">💬</span>
+                </div>
+              </div>`;
+          });
+        });
+      });
+    }
+  
+    function toggleLike(postId) {
+      const ref = db.ref(`likes/${postId}/${currentUser.uid}`);
+      ref.once("value", snap => {
+        if (snap.exists()) ref.remove();
+        else ref.set(true);
+      });
+    }
+  
+    function uploadStory() {
+      const file = document.getElementById("storyFile").files[0];
+      const overlay = document.getElementById("storyOverlay").value;
+  
+      if (!file) return alert("Choose a file to upload.");
+  
+      const fileType = file.type.startsWith("video/") ? "video" : "image";
+      const ref = storage.ref("stories/" + Date.now() + "_" + file.name);
+  
+      ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+        db.ref("users/" + currentUser.uid).once("value", snap => {
+          const user = snap.val() || {};
+          db.ref("times/" + currentUser.uid).set({
+            media: url,
+            type: fileType,
+            overlay,
+            timestamp: Date.now(),
+            name: user.name || "You",
+            pic: user.pic || "https://via.placeholder.com/60?text=👤"
+          }).then(() => {
+            document.getElementById("storyFile").value = "";
+            document.getElementById("storyOverlay").value = "";
+            loadStories();
+            loadStoryRings();
+            alert("Story uploaded!");
+          });
+        });
+      });
+    }
+
+    function loadStories() {
+      db.ref("times").once("value", snap => {
+        const stories = document.getElementById("stories");
+        stories.innerHTML = "";
+        const times = snap.val();
+        if (!times) return;
+        Object.entries(times).forEach(([uid, time]) => {
+          const storyPic = time.pic || "https://via.placeholder.com/60?text=👤";
+          stories.innerHTML += `<div class="story" onclick="showTime('${time.media}', '${time.type}', '${time.overlay}', '${uid}')">
+            <img src="${storyPic}">
+            <div class="username">${time.name}</div>
+          </div>`;
+        });
+      });
+    }
+    
+
+    function loadStoryRings() {
+  db.ref("follows/" + currentUser.uid).once("value", snap => {
+    const following = snap.val() || {};
+    db.ref("users").once("value", userSnap => {
+      const allUsers = userSnap.val() || {};
+      const rings = document.getElementById("storyRings");
+      rings.innerHTML = "";
+
+      Object.keys(following).forEach((uid, i) => {
+        const user = allUsers[uid];
+        if (!user) return;
+        const color = ["blue", "red", "orange", "purple"][i % 4];
+        const ringPic = user.pic || "https://via.placeholder.com/60?text=👤";
+        const badge = verifiedUsers[uid] ? verifiedBadge : "";
+        rings.innerHTML += `
+          <div class="story-ring ${color}" onclick="viewUserProfile('${uid}')">
+            <img src="${ringPic}">${badge}
+          </div>`;
+      });
+    });
+  });
+}
+
+  
+    function showTime(url, type, overlay, ownerUid) {
+      if (ownerUid && currentUser.uid !== ownerUid) {
+        db.ref(`times/${ownerUid}/viewers/${currentUser.uid}`).set(true);
+      }
+      const win = window.open("", "_blank");
+      if (type === "video") {
+        win.document.write(`<video src="${url}" controls autoplay style="width:100%"></video><p>${overlay || ''}</p>`);
+      } else {
+        win.document.write(`<img src="${url}" style="width:100%"><p>${overlay || ''}</p>`);
+      }
+    }
+  
+    function viewUserProfile(uid) {
+      viewingUID = uid;
+      document.getElementById("profilePage").style.display = "block";
+      document.getElementById("feed").style.display = "none";
+  
+      db.ref("users/" + uid).once("value", snap => {
+        const data = snap.val();
+        document.getElementById("profileName").innerText = data?.name || "User";
+        document.getElementById("profileBio").innerText = data?.bio || "";
+      });
+  
+      db.ref("follows").once("value", snap => {
+        const all = snap.val() || {};
+        let count = 0;
+        Object.values(all).forEach(f => { if (f[uid]) count++; });
+        document.getElementById("followerCount").innerText = count;
+      });
+  
+      db.ref("posts").orderByChild("uid").equalTo(uid).once("value", snap => {
+        const posts = snap.val();
+        const box = document.getElementById("profilePosts");
+        box.innerHTML = "<h3>Posts</h3>";
+        if (posts) {
+          Object.values(posts).reverse().forEach(p => {
+            const postImage = p.imageUrl ? `<img class="post-img" src="${p.imageUrl}">` : "";
+            box.innerHTML += `<div class='post'>
+              <div class='meta'>
+                <img src='${p.pic || "https://via.placeholder.com/40?text=👤"}'/>
+                <strong>${p.name}</strong>
+              </div>
+              <div>${p.text}</div>
+              ${postImage}
+            </div>`;
+          });
+        } else {
+          box.innerHTML += "<p>No posts</p>";
+        }
+      });
+  
+      const btn = document.getElementById("followBtn");
+      if (uid === currentUser.uid) {
+        btn.style.display = "none";
+      } else {
+        btn.style.display = "inline-block";
+        db.ref("follows/" + currentUser.uid + "/" + uid).once("value", snap => {
+          btn.innerText = snap.exists() ? "Unfollow" : "Follow";
+        });
+      }
+    }
+  
+    function toggleFollow() {
+      const ref = db.ref("follows/" + currentUser.uid + "/" + viewingUID);
+      ref.once("value", snap => {
+        if (snap.exists()) {
+          ref.remove();
+          document.getElementById("followBtn").innerText = "Follow";
+        } else {
+          ref.set(true);
+          document.getElementById("followBtn").innerText = "Unfollow";
+        }
+      });
+    }
+  
+    function closeProfile() {
+      document.getElementById("profilePage").style.display = "none";
+      document.getElementById("feed").style.display = "block";
+    }
+  
+    function cleanupOldStories() {
+      const now = Date.now();
+      db.ref("times").once("value", snap => {
+        const stories = snap.val();
+        if (!stories) return;
+        Object.entries(stories).forEach(([uid, story]) => {
+          if (story.timestamp && now - story.timestamp > 24 * 60 * 60 * 1000) {
+            db.ref("times/" + uid).remove();
+          }
+        });
+      });
+    }
+    
+    function openEditor() {
+      db.ref("users/" + currentUser.uid).once("value").then(snap => {
+        const user = snap.val() || {};
+        document.getElementById("editName").value = user.name || "";
+        document.getElementById("editBio").value = user.bio || "";
+        document.getElementById("profileEditor").style.display = "block";
+        document.getElementById("editorOverlay").style.display = "block";
+      });
+    }
+
+    function closeEditor() {
+      document.getElementById("profileEditor").style.display = "none";
+      document.getElementById("editorOverlay").style.display = "none";
+    }
+
+    function saveProfileEdits() {
+      const name = document.getElementById("editName").value;
+      const bio = document.getElementById("editBio").value;
+      const file = document.getElementById("editPic").files[0];
+
+      if (!name) return alert("Username is required.");
+
+      const updates = { name, bio };
+
+      if (file) {
+        const ref = storage.ref("profilePics/" + currentUser.uid + "_" + Date.now());
+        ref.put(file)
+          .then(snap => snap.ref.getDownloadURL())
+          .then(url => {
+            updates.pic = url;
+            return db.ref("users/" + currentUser.uid).update(updates);
+          })
+          .then(() => {
+            alert("Profile updated!");
+            closeEditor();
+            location.reload();
+          });
+      } else {
+        db.ref("users/" + currentUser.uid).update(updates).then(() => {
+          alert("Profile updated!");
+          closeEditor();
+          location.reload();
+        });
+      }
+    }
+    auth.onAuthStateChanged(user => {
+    if (user) {
+      currentUser = user;
+      document.getElementById("loginModal").style.display = "none";
+      loadStoryRings();
+    } else {
+      document.getElementById("loginModal").style.display = "flex";
+    }
+  });
+
+  function loginWithEmail() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    auth.signInWithEmailAndPassword(email, password).catch(alert);
+  }
+
+  function signUpWithEmail() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    auth.createUserWithEmailAndPassword(email, password).catch(alert);
+  }
+
+  function loginWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(alert);
+  }
+  </script>
+  
+</body>
+</html>
