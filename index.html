@@ -236,7 +236,8 @@
   <!-- Create Post -->
   <div class="new-post">
     <input id="postInput" placeholder="What's on your mind?" type="text">
-    
+    <input type="file" id="postImage" accept="image/*">
+
     <button onclick="createPost()">Post</button>
   </div>
 
@@ -310,44 +311,59 @@ const verifiedBadge = '<img src="" style="width:14px;margin-left:-5px;margin-top
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
       }
     });
-  
+    const fileInput = document.getElementById("postImage");
+const file = fileInput ? fileInput.files[0] : null;
+
     function logout() {
       auth.signOut().then(() => location.reload());
     }
   
     function createPost() {
-      const text = document.getElementById("postInput").value;
-      const file = document.getElementById("postImage").files[0];
-      if (!text && !file) return;
-  
-      db.ref("users/" + currentUser.uid).once("value").then(snap => {
-        const user = snap.val() || {};
-        const postData = {
-          uid: currentUser.uid,
-          name: user.name || currentUser.displayName || "Anonymous",
-          pic: user.pic || currentUser.photoURL || "https://via.placeholder.com/40?text=👤",
-          text,
-          timestamp: Date.now(),
-          likes: 0,
-          comments: 0
-        };
-  
-        if (file) {
-          const storageRef = storage.ref("postImages/" + Date.now() + "_" + file.name);
-          storageRef.put(file)
-            .then(snapshot => snapshot.ref.getDownloadURL())
-            .then(url => {
-              postData.imageUrl = url;
-              db.ref("posts").push(postData);
-              document.getElementById("postInput").value = "";
-              document.getElementById("postImage").value = "";
-            });
-        } else {
-          db.ref("posts").push(postData);
+  const text = document.getElementById("postInput").value.trim();
+  const imageInput = document.getElementById("postImage");
+  const file = imageInput ? imageInput.files[0] : null;
+
+  if (!text && !file) {
+    alert("Write something or add an image.");
+    return;
+  }
+
+  db.ref("users/" + currentUser.uid).once("value").then(snap => {
+    const user = snap.val() || {};
+    const postData = {
+      uid: currentUser.uid,
+      name: user.name || currentUser.displayName || "Anonymous",
+      pic: user.pic || currentUser.photoURL || "https://via.placeholder.com/40?text=👤",
+      text,
+      timestamp: Date.now(),
+      likes: 0,
+      comments: 0
+    };
+
+    if (file) {
+      const storageRef = storage.ref("postImages/" + Date.now() + "_" + file.name);
+      storageRef.put(file)
+        .then(snapshot => snapshot.ref.getDownloadURL())
+        .then(url => {
+          postData.imageUrl = url;
+          return db.ref("posts").push(postData);
+        })
+        .then(() => {
           document.getElementById("postInput").value = "";
-        }
+          document.getElementById("postImage").value = "";
+        })
+        .catch(error => {
+          alert("Image upload failed: " + error.message);
+        });
+    } else {
+      db.ref("posts").push(postData).then(() => {
+        document.getElementById("postInput").value = "";
+        document.getElementById("postImage").value = "";
       });
     }
+  });
+}
+
   
     function loadPosts() {
       db.ref("posts").on("value", snap => {
