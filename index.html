@@ -11,6 +11,73 @@
   <link rel="apple-touch-icon" href="Blip Logo Design.png">
   <title>Blip V0.02</title>
   <style>
+    
+    .comment-popup {
+    display: none;
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    z-index: 9999;
+    animation: popupSlide 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  @keyframes popupSlide {
+    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+  }
+
+  .comment-popup h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    color: #333;
+  }
+
+  #commentsList > div {
+    padding: 10px;
+    background: #f5f5f5;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #222;
+  }
+
+  .comment-popup textarea {
+    width: 100%;
+    height: 60px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    resize: none;
+    font-size: 14px;
+    margin-top: 8px;
+    box-sizing: border-box;
+  }
+
+  .comment-popup button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .comment-popup button:hover {
+    background-color: #145ddc;
+  }
     /* Make everything scale on small screens */
 * {
   box-sizing: border-box;
@@ -26,6 +93,22 @@ body {
 .header, .new-post, .feed, .stories, .rings, #profileEditor, .page {
   max-width: 100%;
   width: 100%;
+}
+.file-upload-btn {
+  display: inline-block;
+  background-color: #1877f2;
+  color: white;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.file-upload-btn:hover {
+  background-color: #145ddc;
 }
 
 /* Make layout stack vertically on small screens */
@@ -89,6 +172,23 @@ n
   max-width: 500px;
   display: block;
 }
+.post-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 10px;
+  scroll-behavior: smooth;
+}
+
+.post-carousel img {
+  flex: 0 0 100%;
+  width: 100%;
+  object-fit: cover;
+  scroll-snap-align: center;
+  border-radius: 10px;
+}
 
 /* User pic icon */
 #user-pic img {
@@ -144,7 +244,26 @@ n
   border-radius: 8px;
   cursor: pointer;
 }
+.meta strong img {
+  vertical-align: middle;
+  border-radius: 50%;
+}
 
+.comment-popup {
+      display: none;
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 400px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 15px;
+      z-index: 9999;
+    }
     body {
       font-family: sans-serif;
       margin: 0;
@@ -222,7 +341,13 @@ n
       border: 1px solid #ccc;
       border-radius: 8px;
     }
-
+    .hellnah{
+      padding: 10px;
+      background: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
     .new-post button {
       padding: 10px;
       background: #1877f2;
@@ -251,6 +376,20 @@ n
   color: #1877f2;
   cursor: pointer;
   font-weight: bold;
+}
+input[type="file"]::file-selector-button {
+  padding: 10px;
+  background: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: #145ddc;
 }
 
     .post img.post-img {
@@ -286,6 +425,28 @@ n
   height: 16px;
   margin-left: 4px;
   vertical-align: middle;
+}
+.carousel {
+  overflow-x: scroll;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 10px;
+}
+
+.carousel-img {
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+  scroll-snap-align: center;
 }
 
     .stats {
@@ -405,11 +566,27 @@ n
     <button onclick="saveProfileEdits()">Save</button>
     <button onclick="closeEditor()">Cancel</button>
   </div>
-
+  <div class="mutual-followers" id="mutual-${postId}" style="font-size: 13px; color: #777; margin-left: 50px;"></div>
+  <div id="loginSection" style="text-align:center; margin:20px; display:none;">
+    <button onclick="loginWithGoogle()" style="padding:10px 20px; background:#1877f2; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+      Sign in with Google
+    </button>
+  </div>
+  
   <!-- Create Post -->
   <div class="new-post">
     <input id="postInput" placeholder="What's on your mind?" type="text">
-    <input type="file" id="postImage" accept="image/*">
+    
+    <input type="file" id="postImage" accept="image/*" multiple onchange="validateImageLimit(this)">
+    <script>
+    function validateImageLimit(input) {
+      if (input.files.length > 10) {
+        alert("You can only upload up to 10 images.");
+        input.value = ""; // Clear selection
+      }
+    }
+    </script>
+
  
 
     <button onclick="createPost()">Post</button>
@@ -420,6 +597,7 @@ n
   
   <div class="feed" id="feed"></div>
 
+
   <!-- Profile Page -->
   <div class="page" id="profilePage" style="padding: 20px;">
     <span onclick="closeProfile()" style="cursor:pointer; font-size:18px;">← Back</span>
@@ -429,7 +607,18 @@ n
     <button id="followBtn" class="follow-btn" onclick="toggleFollow()">Follow</button>
     <div id="profilePosts"></div>
   </div>
-
+  <button onclick="toggleComments()">💬</button>
+  <div class="post-carousel" id="carousel-${postId}">
+    ${post.imageUrls.map(url => `<img src="${url}" />`).join("")}
+  </div>
+  
+  <div id="commentPopup" style="display:none; position:fixed; bottom:0; left:0; right:0; background:white; padding:10px; border-top:1px solid #ccc; box-shadow:0 -2px 5px rgba(0,0,0,0.1); z-index:1000;">
+    <div id="commentList" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
+    <input id="newComment" placeholder="Add a comment..." style="width:70%; padding:8px;">
+    <button onclick="postComment()" style="padding:8px;">Post</button>
+    <button onclick="closeCommentPopup()" style="float:right;">✖</button>
+  </div>
+  
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -463,40 +652,36 @@ const verifiedBadge = '<img src="" style="width:14px;margin-left:-5px;margin-top
     let viewingUID = null;
   
     auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        db.ref("users/" + user.uid).once("value", snap => {
-          if (!snap.exists()) {
-            const name = prompt("Pick your username:");
-            const defaultPic = user.photoURL || "https://via.placeholder.com/40?text=👤";
-            if (name) {
-              db.ref("users/" + user.uid).set({
-                name,
-                bio: "",
-                pic: defaultPic
-              });
-            }
-          }
-        });
-  
-        const profilePic = user.photoURL || "https://via.placeholder.com/30?text=👤";
-        document.getElementById("user-pic").innerHTML = `<img src="${profilePic}" style="width:30px; height:30px; border-radius:50%">`;
-  
-        loadPosts();
-        loadStories();
-        loadStoryRings();
-        cleanupOldStories();
-      } else {
-        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  currentUser = user;
+  const loginSection = document.getElementById("loginSection");
+
+  if (user) {
+    loginSection.style.display = "none";
+    document.getElementById("user-pic").innerHTML = `<img src="${user.photoURL || "https://via.placeholder.com/40?text=👤"}" style="width:30px;height:30px;border-radius:50%;">`;
+
+    db.ref("users/" + user.uid).once("value", snap => {
+      if (!snap.exists()) {
+        const name = prompt("Pick your username:");
+        const defaultPic = user.photoURL || "https://via.placeholder.com/40?text=👤";
+        if (name) {
+          db.ref("users/" + user.uid).set({
+            name,
+            bio: "",
+            pic: defaultPic
+          });
+        }
       }
     });
-    const fileInput = document.getElementById("postImage");
-const file = fileInput ? fileInput.files[0] : null;
 
-    function logout() {
-      auth.signOut().then(() => location.reload());
-    }
-  
+    loadPosts();
+    loadStories();
+    loadStoryRings();
+    cleanupOldStories();
+  } else {
+    loginSection.style.display = "block";
+  }
+});
+
     function createPost() {
   const text = document.getElementById("postInput").value.trim();
   const hashtags = extractHashtags(text);
@@ -561,7 +746,6 @@ function loadPosts() {
     const data = snapshot.val();
     const feed = document.getElementById("feed");
     feed.innerHTML = "";
-
     if (!data) return;
 
     const sortedPosts = Object.entries(data).sort((a, b) => b[1].timestamp - a[1].timestamp);
@@ -571,38 +755,119 @@ function loadPosts() {
         const likeCount = likeSnap.numChildren();
         const isLiked = !!likeSnap.child(currentUser.uid).val();
         const likedClass = isLiked ? "liked" : "";
-        const userPic = post.pic || "https://via.placeholder.com/40?text=👤";
-        const imgHtml = post.imageUrl ? `<img class="post-img" src="${post.imageUrl}" />` : "";
         const isVerified = verifiedUsers[post.uid];
         const verified = isVerified ? `<img src="https://cdn3d.iconscout.com/3d/premium/thumb/golden-verified-status-3d-icon-download-in-png-blend-fbx-gltf-file-formats--gold-approved-premium-pack-startup-icons-8796427.png" class="verified-icon">` : "";
-
         const canDelete = post.uid === currentUser.uid;
         const deleteBtn = canDelete ? `<span class="delete-btn" onclick="deletePost('${postId}')">🗑️</span>` : "";
+        const userPic = post.pic || "https://via.placeholder.com/40?text=👤";
 
-        feed.innerHTML += `
-          <div class="post">
-            <div class="meta">
-              <img src="${userPic}" onclick="viewUserProfile('${post.uid}')">
-              <strong>${post.name}${verified}</strong>
-              ${deleteBtn}
+        // Images
+        let imgHtml = "";
+        if (post.imageUrls && Array.isArray(post.imageUrls) && post.imageUrls.length > 1) {
+          const slides = post.imageUrls.map(url => `<img src="${url}" class="carousel-img">`).join('');
+          imgHtml = `
+            <div class="carousel" id="carousel-${postId}">
+              <div class="carousel-track">${slides}</div>
             </div>
-            <div>${formatPostText(post.text)}</div>
-            ${imgHtml}
-            <div class="stats">
-              <span class="like-btn ${likedClass}" onclick="toggleLike('${postId}')">♥</span>
-              <span>${likeCount} like${likeCount !== 1 ? 's' : ''}</span>
-              <span class="comment-btn">💬</span>
+          `;
+        } else if (post.imageUrl) {
+          imgHtml = `<img class="post-img" src="${post.imageUrl}" />`;
+        }
+
+        // Followers → Badges
+        db.ref("follows").once("value", followSnap => {
+          let followerCount = 0;
+          const allFollows = followSnap.val() || {};
+          Object.values(allFollows).forEach(f => {
+            if (f[post.uid]) followerCount++;
+          });
+
+          let badgeUrl = "";
+          if (followerCount >= 5000) {
+            badgeUrl = "rainbow.png"; // rainbow
+          } else if (followerCount >= 1000) {
+            badgeUrl = "blue.png"; // blue
+          } else if (followerCount >= 500) {
+            badgeUrl = "red.png"; // red
+          } else if (followerCount >= 1) {
+            badgeUrl = "yellow.png"; // yellow
+          }
+
+          const badgeHtml = badgeUrl
+            ? `<img src="${badgeUrl}" title="${followerCount} followers" style="width:20px;height:20px;margin-left:4px;">`
+            : "";
+
+          // Final post block
+          const postBlock = `
+            <div class="post">
+              <div class="meta">
+                <img src="${userPic}" onclick="viewUserProfile('${post.uid}')">
+                <div>
+                  <strong>${post.name}${verified}${badgeHtml}</strong>
+                  <div class="mutual-followers" id="mutual-${postId}" style="font-size: 13px; color: #777;"></div>
+                </div>
+                ${deleteBtn}
+              </div>
+              <div>${formatPostText(post.text)}</div>
+              ${imgHtml}
+              <div class="stats">
+                <span class="like-btn ${likedClass}" onclick="toggleLike('${postId}')">♥</span>
+                <span>${likeCount} like${likeCount !== 1 ? 's' : ''}</span>
+                <span class="comment-btn" onclick="openCommentPopup('${postId}')">💬</span>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+
+          feed.innerHTML += postBlock;
+
+          getMutualFollowersText(post.uid, text => {
+            const el = document.getElementById("mutual-" + postId);
+            if (el) el.textContent = text;
+          });
+
+          setTimeout(() => enableSwipeCarousel(), 50);
+        });
       });
     });
   });
 }
+
+
 function formatPostText(text) {
   return text.replace(/#(\w+)/g, (match, tag) => {
     return `<span class="hashtag" onclick="searchHashtag('${tag}')">#${tag}</span>`;
   });
+}
+let currentCommentPostId = "";
+
+function openCommentPopup(postId) {
+  currentCommentPostId = postId;
+  const popup = document.getElementById("commentPopup");
+  popup.style.display = "block";
+  const list = document.getElementById("commentList");
+  list.innerHTML = "<em>Loading...</em>";
+
+  db.ref("comments/" + postId).once("value", snap => {
+    list.innerHTML = "";
+    const comments = snap.val() || {};
+    Object.entries(comments).forEach(([id, comment]) => {
+      const avatar = comment.pic || "https://via.placeholder.com/40?text=👤";
+      list.innerHTML += `
+        <div style="display:flex;gap:10px;margin-bottom:5px;">
+          <img src="${avatar}" style="width:30px;height:30px;border-radius:50%;">
+          <div>
+            <strong>${comment.name}</strong><br>${comment.text}
+          </div>
+        </div>
+      `;
+    });
+  });
+}
+
+
+
+function closeCommentPopup() {
+  document.getElementById("commentPopup").style.display = "none";
 }
 
     function searchPosts() {
@@ -770,7 +1035,9 @@ function searchHashtag(tag) {
         const all = snap.val() || {};
         let count = 0;
         Object.values(all).forEach(f => { if (f[uid]) count++; });
-        document.getElementById("followerCount").innerText = count;
+        document.getElementById("followerCount").innerHTML = `${count} Followers ${getFollowerBadgeImage(count)}`;
+
+
       });
       
 
@@ -917,9 +1184,10 @@ if (file) {
   }
 
   function loginWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(alert);
-  }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err => alert("Login failed: " + err.message));
+}
+
     const storageRef = firebase.app().storage("gs://nopeeking-e272a.firebasestorage.app").ref("postImages/" + file.name)
 storageRef.put(file)
   .then(snapshot => snapshot.ref.getDownloadURL())
@@ -960,6 +1228,183 @@ storageRef.put(file)
     reader.readAsDataURL(file);
   });
 }
+// RENDER COMMENTS
+function renderComments(postId, container) {
+  db.ref("comments/" + postId).once("value", snap => {
+    const data = snap.val();
+    if (!data) return;
+    Object.entries(data).forEach(([commentId, comment]) => {
+      const div = document.createElement("div");
+      div.className = "comment";
+      const userPic = comment.pic || "https://via.placeholder.com/30";
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <img src="${userPic}" style="width:30px;height:30px;border-radius:50%;">
+          <strong>${comment.name}</strong>: ${comment.text}
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  });
+}
+
+// POST A COMMENT
+
+// MUTUAL FOLLOWERS TEXT (e.g. “Followed by Leo & 2 others”)
+function getMutualFollowersText(targetUid, callback) {
+  db.ref("follows/" + targetUid).once("value", snap => {
+    const targetFollowers = snap.val() || {};
+    db.ref("follows/" + currentUser.uid).once("value", mySnap => {
+      const myFollows = mySnap.val() || {};
+      const mutuals = Object.keys(targetFollowers).filter(uid => myFollows[uid]);
+      if (mutuals.length === 0) return callback("");
+      const displayNames = [];
+      let count = 0;
+      const limit = 3;
+      mutuals.slice(0, limit).forEach(uid => {
+        db.ref("users/" + uid).once("value", userSnap => {
+          displayNames.push(userSnap.val()?.name || "Someone");
+          count++;
+          if (count === Math.min(mutuals.length, limit)) {
+            const others = mutuals.length - displayNames.length;
+            const extra = others > 0 ? ` & ${others} other${others > 1 ? "s" : ""}` : "";
+            callback("Followed by " + displayNames.join(", ") + extra);
+          }
+        });
+      });
+    });
+  });
+}
+
+
+function toggleComments() {
+    const popup = document.getElementById("commentPopup");
+    popup.style.display = popup.style.display === "block" ? "none" : "block";
+  } function postComment() {
+    const text = document.getElementById("commentInput").value;
+    const list = document.getElementById("commentsList");
+    if (text.trim() === "") return;
+    const item = document.createElement("div");
+    item.innerText = text;
+    list.appendChild(item);
+    document.getElementById("commentInput").value = "";
+  }
+  window.addEventListener("scroll", () => {
+    document.getElementById("commentPopup").style.display = "none";
+  });
+  function showMutualFollowers(postId, targetUid) {
+  const mutualContainer = document.getElementById("mutual-" + postId);
+  if (!currentUser || !mutualContainer) return;
+
+  db.ref("follows/" + targetUid).once("value", snap => {
+    const theirFollowers = snap.val() || {};
+
+    db.ref("follows/" + currentUser.uid).once("value", mySnap => {
+      const myFollows = mySnap.val() || {};
+
+      const mutuals = Object.keys(theirFollowers).filter(uid => myFollows[uid]);
+      if (mutuals.length === 0) return;
+
+      const names = [];
+      const promises = mutuals.slice(0, 2).map(uid =>
+        db.ref("users/" + uid).once("value").then(userSnap => {
+          const name = userSnap.val()?.name;
+          if (name) names.push(name);
+        })
+      );
+
+      Promise.all(promises).then(() => {
+        let text = "Followed by " + names.join(" & ");
+        if (mutuals.length > 2) {
+          text += ` & ${mutuals.length - 2} others`;
+        }
+        mutualContainer.innerText = text;
+      });
+    });
+  });
+}
+showMutualFollowers(postId, post.uid);
+function enableSwipeCarousel() {
+  const carousels = document.querySelectorAll(".carousel-track");
+
+  carousels.forEach(track => {
+    let startX = 0;
+    let currentTranslate = 0;
+
+    track.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+    });
+
+    track.addEventListener("touchmove", e => {
+      if (!startX) return;
+      let diff = startX - e.touches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        const direction = diff > 0 ? 1 : -1;
+        const width = track.offsetWidth;
+        currentTranslate += direction * width;
+        currentTranslate = Math.max(Math.min(currentTranslate, (track.childElementCount - 1) * width), 0);
+        track.style.transform = `translateX(-${currentTranslate}px)`;
+        startX = 0;
+      }
+    });
+  });
+}
+function autoScrollCarousels() {
+  document.querySelectorAll(".post-carousel").forEach(carousel => {
+    let scrollPos = 0;
+    const interval = setInterval(() => {
+      scrollPos += carousel.clientWidth;
+      if (scrollPos >= carousel.scrollWidth) {
+        scrollPos = 0;
+      }
+      carousel.scrollTo({ left: scrollPos, behavior: 'smooth' });
+    }, 3000);
+  });
+}
+function autoScrollCarousels() {
+  document.querySelectorAll(".post-carousel").forEach(carousel => {
+    let scrollAmount = 0;
+    const interval = setInterval(() => {
+      if (carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 5) {
+        scrollAmount = 0;
+      } else {
+        scrollAmount += carousel.clientWidth;
+      }
+      carousel.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+    }, 3000);
+  });
+}
+
+// run after posts are loaded
+setTimeout(autoScrollCarousels, 1500);
+
+// Call after posts are loaded
+setTimeout(autoScrollCarousels, 1500);
+function enableSwipeCarousel() {
+  document.querySelectorAll('.carousel-track').forEach(track => {
+    let index = 0;
+    const scroll = () => {
+      const children = track.children;
+      if (children.length > 1) {
+        index = (index + 1) % children.length;
+        track.scrollTo({
+          left: children[index].offsetLeft,
+          behavior: 'smooth'
+        });
+      }
+    };
+    setInterval(scroll, 3000); // auto scroll every 3s
+  });
+}
+
+function getFollowerBadgeImage(followerCount) {
+  if (followerCount >= 10000) return `<img src="${badges.eren}" title="Eren Titan Badge" style="height:18px;margin-left:5px;">`;
+  if (followerCount >= 1000) return `<img src="${badges.elite}" title="Elite Badge" style="height:18px;margin-left:5px;">`;
+  if (followerCount >= 100) return `<img src="${badges.beginner}" title="Beginner Badge" style="height:18px;margin-left:5px;">`;``
+
+  return "";
+}
+
 
   </script>
   
