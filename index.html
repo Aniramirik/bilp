@@ -11,7 +11,10 @@
   <link rel="apple-touch-icon" href="Blip Logo Design.png">
   <title>Blip V0.02</title>
   <style>
-    
+    #moooodsContainer > div {
+  scroll-snap-align: start;
+}
+
     .comment-popup {
     display: none;
     position: fixed;
@@ -74,7 +77,44 @@
     cursor: pointer;
     transition: background 0.2s ease;
   }
-
+  #groupAppScreen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      z-index: 99999;
+      overflow: auto;
+    }
+    #groupChat {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 20px;
+    }
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    #chatInput {
+      display: flex;
+    }
+    #chatInput input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #chatInput button {
+      padding: 10px;
+      background: #1877f2;
+      color: white;
+      border: none;
+    }
   .comment-popup button:hover {
     background-color: #145ddc;
   }
@@ -82,12 +122,28 @@
 * {
   box-sizing: border-box;
 }
+.mood-media {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  display: block;
+  background: black;
+}
 
 body {
   margin: 0;
   font-family: sans-serif;
   background: #f2f2f2;
   overflow-x: hidden;
+}
+#moooodsContainer {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+}
+
+#moooodsContainer > div {
+  scroll-snap-align: start;
 }
 
 .header, .new-post, .feed, .stories, .rings, #profileEditor, .page {
@@ -341,6 +397,11 @@ n
       border: 1px solid #ccc;
       border-radius: 8px;
     }
+    #sharePopup.show {
+  display: block !important;
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
     .hellnah{
       padding: 10px;
       background: #1877f2;
@@ -359,6 +420,29 @@ n
     .feed {
       padding: 10px;
     }
+   
+    
+  #sharePopup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 100000;
+    opacity: 0;
+    transition: all 0.25s ease;
+  }
+
+  #sharePopup.show {
+    display: block !important;
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+
 
     .post {
       background: white;
@@ -555,7 +639,23 @@ input[type="file"]::file-selector-button:hover {
   <div class="stories" id="stories"></div>
 
   <!-- Upload Story -->
-  
+  <div id="bottomNav" style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: #ffffff;
+  border-top: 1px solid #ccc;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 9999;
+">
+  <img src="Untitled design (1).svg" onclick="goToFeed()" style="height: 30px; cursor: pointer;">
+  <img src="Untitled design (2).svg" onclick="openMoooods()" style="height: 30px; cursor: pointer;">
+</div>
+
   <!-- Profile Editor Modal -->
   <div class="overlay" id="editorOverlay"></div>
   <div id="profileEditor">
@@ -577,7 +677,8 @@ input[type="file"]::file-selector-button:hover {
   <div class="new-post">
     <input id="postInput" placeholder="What's on your mind?" type="text">
     
-    <input type="file" id="postImage" accept="image/*" multiple onchange="validateImageLimit(this)">
+    <input type="file" id="postImage" accept="image/*,video/*" multiple onchange="validateImageLimit(this)">
+
     <script>
     function validateImageLimit(input) {
       if (input.files.length > 10) {
@@ -597,7 +698,32 @@ input[type="file"]::file-selector-button:hover {
   
   <div class="feed" id="feed"></div>
 
-
+  <div id="moooodsScreen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;overflow:hidden;">
+    <button onclick="closeMoooods()" style="position:absolute;top:10px;right:10px;padding:10px;background:red;color:white;border:none;border-radius:50%;">✖</button>
+    <div id="moooodsContainer" style="height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;"></div>
+    <div style="position:absolute;right:10px;bottom:50px;display:flex;flex-direction:column;align-items:center;gap:20px;">
+     
+      <div id="bottomNav" style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: #ffffff;
+  border-top: 1px solid #ccc;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 9999;
+">
+  <img src="Untitled design (1).svg" onclick="goToFeed()" style="height: 30px; cursor: pointer;">
+  <img src="Untitled design (2).svg" onclick="openMoooods()" style="height: 30px; cursor: pointer;">
+</div>
+    </div>
+    
+  
+    </div>
+  </div>
   <!-- Profile Page -->
   <div class="page" id="profilePage" style="padding: 20px;">
     <span onclick="closeProfile()" style="cursor:pointer; font-size:18px;">← Back</span>
@@ -607,10 +733,13 @@ input[type="file"]::file-selector-button:hover {
     <button id="followBtn" class="follow-btn" onclick="toggleFollow()">Follow</button>
     <div id="profilePosts"></div>
   </div>
-  <button onclick="toggleComments()">💬</button>
-  <div class="post-carousel" id="carousel-${postId}">
-    ${post.imageUrls.map(url => `<img src="${url}" />`).join("")}
+  
+  <div id="sharePopup">
+    <p style="margin-bottom: 15px; font-weight: bold;">Share this post</p>
+    <button onclick="copyShareLink()" style="padding:10px 20px; background:#1877f2; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Copy Link</button>
+    <button onclick="closeSharePopup()" style="margin-top:10px; display:block; background:none; border:none; color:#555; cursor:pointer;">Cancel</button>
   </div>
+  
   
   <div id="commentPopup" style="display:none; position:fixed; bottom:0; left:0; right:0; background:white; padding:10px; border-top:1px solid #ccc; box-shadow:0 -2px 5px rgba(0,0,0,0.1); z-index:1000;">
     <div id="commentList" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
@@ -645,6 +774,7 @@ input[type="file"]::file-selector-button:hover {
   "wQv32fQ848d2QOYWFl0JcJcLHmZ2": true,
   "H05KT1PoBgYBpAucIoLDjCfypCl2": true,
   "AuDjAuoM0nff0nBgMomSjO20lup2": true,
+
   
 };
 const verifiedBadge = '<img src="" style="width:14px;margin-left:-5px;margin-top:-5px;position:absolute;" title="Verified">';
@@ -683,25 +813,23 @@ const verifiedBadge = '<img src="" style="width:14px;margin-left:-5px;margin-top
   }
 });
 
-    function createPost() {
-  const text = document.getElementById("postInput").value.trim();
-  const hashtags = extractHashtags(text);
-  const imageInput = document.getElementById("postImage");
-  const file = imageInput ? imageInput.files[0] : null;
+function createPost() {
+  const uploads = files.map(async file => {
+  const isVideo = file.type.startsWith("video/");
+  const isAudio = file.type.startsWith("audio/");
+  const path = isVideo ? 'postVideos/' : isAudio ? 'postAudios/' : 'postImages/';
+  const storageRef = storage.ref(path + Date.now() + '_' + file.name);
+  const snapshot = await storageRef.put(file);
+  const url = await snapshot.ref.getDownloadURL();
 
-  if (!text && !file) {
-    alert("Write something or add an image.");
-    return;
-  }
-  function formatTextWithHashtags(text) {
-  return text.replace(/#\w+/g, tag => {
-    const clean = tag.toLowerCase();
-    return `<span class="hashtag" onclick="searchTag('${clean}')">${tag}</span>`;
-  });
-}
+  if (isVideo) postData.videoUrls.push(url);
+  else if (isAudio) postData.audioUrl = url;
+  else postData.imageUrls.push(url);
+});
 
   db.ref("users/" + currentUser.uid).once("value").then(snap => {
     const user = snap.val() || {};
+
     const postData = {
       uid: currentUser.uid,
       name: user.name || currentUser.displayName || "Anonymous",
@@ -710,35 +838,37 @@ const verifiedBadge = '<img src="" style="width:14px;margin-left:-5px;margin-top
       timestamp: Date.now(),
       likes: 0,
       comments: 0,
-      hashtags: hashtags
+      hashtags: hashtags,
+      imageUrls: [],
+      videoUrls: []
     };
-    function searchTag(tag) {
-  document.getElementById("searchInput").value = tag;
-  searchPosts();
-}
 
-    if (file) {
-      const storageRef = storage.ref("postImages/" + Date.now() + "_" + file.name);
-      storageRef.put(file)
+    const uploads = files.map(file => {
+      const isVideo = file.type.startsWith("video/");
+      const path = isVideo ? "postVideos/" : "postImages/";
+      const storageRef = storage.ref(path + Date.now() + "_" + file.name);
+      return storageRef.put(file)
         .then(snapshot => snapshot.ref.getDownloadURL())
         .then(url => {
-          postData.imageUrl = url;
-          return db.ref("posts").push(postData);
-        })
-        .then(() => {
-          document.getElementById("postInput").value = "";
-          document.getElementById("postImage").value = "";
-        })
-        .catch(error => {
-          alert("Image upload failed: " + error.message);
+          if (isVideo) {
+            postData.videoUrls.push(url);
+          } else {
+            postData.imageUrls.push(url);
+          }
         });
-    } else {
-      db.ref("posts").push(postData).then(() => {
-        document.getElementById("postInput").value = "";
-        document.getElementById("postImage").value = "";
-      });
-    }
+    });
+
+    return Promise.all(uploads).then(() => db.ref("posts").push(postData));
+  }).then(() => {
+    document.getElementById("postInput").value = "";
+    document.getElementById("postImage").value = "";
+  }).catch(error => {
+    alert("Upload failed: " + error.message);
   });
+  document.getElementById("postInput").value = "";
+document.getElementById("postImage").value = "";
+loadPosts(); // 👈 auto reload feed
+
 }
 
   
@@ -763,18 +893,28 @@ function loadPosts() {
         const userPic = post.pic || "https://via.placeholder.com/40?text=👤";
 
         // Images
-        let imgHtml = "";
-        if (post.imageUrls && Array.isArray(post.imageUrls) && post.imageUrls.length > 1) {
-          const slides = post.imageUrls.map(url => `<img src="${url}" class="carousel-img">`).join('');
-          imgHtml = `
-            <div class="carousel" id="carousel-${postId}">
-              <div class="carousel-track">${slides}</div>
-            </div>
-          `;
-        } else if (post.imageUrl) {
-          imgHtml = `<img class="post-img" src="${post.imageUrl}" />`;
-        }
+        let imageHtml = "";
+let videoHtml = "";
 
+// If multiple images
+if (Array.isArray(post.imageUrls) && post.imageUrls.length > 0) {
+  const slides = post.imageUrls.map(url => `<img src="${url}" class="carousel-img">`).join('');
+  imageHtml = `
+    <div class="carousel">
+      <div class="carousel-track">${slides}</div>
+    </div>
+  `;
+}
+if (post.audioUrl) {
+  media += `<audio src="${post.audioUrl}" autoplay loop></audio>`;
+}
+
+// If multiple videos
+if (Array.isArray(post.videoUrls) && post.videoUrls.length > 0) {
+  videoHtml = post.videoUrls.map(url =>
+    `<video src="${url}" controls class="post-img" style="max-height: 400px; border-radius: 10px; width: 100%; margin-top: 10px;"></video>`
+  ).join('');
+}
         // Followers → Badges
         db.ref("follows").once("value", followSnap => {
           let followerCount = 0;
@@ -800,26 +940,28 @@ function loadPosts() {
 
           // Final post block
           const postBlock = `
-            <div class="post">
-              <div class="meta">
-                <img src="${userPic}" onclick="viewUserProfile('${post.uid}')">
-                <div>
-                  <strong>${post.name}${verified}${badgeHtml}</strong>
-                  <div class="mutual-followers" id="mutual-${postId}" style="font-size: 13px; color: #777;"></div>
-                </div>
-                ${deleteBtn}
-              </div>
-              <div>${formatPostText(post.text)}</div>
-              ${imgHtml}
-              <div class="stats">
-                <span class="like-btn ${likedClass}" onclick="toggleLike('${postId}')">♥</span>
-                <span>${likeCount} like${likeCount !== 1 ? 's' : ''}</span>
-                <span class="comment-btn" onclick="openCommentPopup('${postId}')">💬</span>
-              </div>
-            </div>
-          `;
+  <div class="post">
+    <div class="meta">
+      <img src="${userPic}" onclick="viewUserProfile('${post.uid}')">
+      <div>
+        <strong>${post.name}${verified}${badgeHtml}</strong>
+        <div class="mutual-followers" id="mutual-${postId}" style="font-size: 13px; color: #777;"></div>
+      </div>
+      ${deleteBtn}
+    </div>
+    <div>${formatPostText(post.text)}</div>
+    ${imageHtml}
+    ${videoHtml}
+    <div class="stats">
+      <span class="like-btn ${likedClass}" onclick="toggleLike('${postId}')">♥</span>
+      <span>${likeCount} like${likeCount !== 1 ? 's' : ''}</span>
+      <span class="comment-btn" onclick="openCommentPopup('${postId}')">💬</span>
+    </div>
+  </div>
+`;
+feed.innerHTML += postBlock;
 
-          feed.innerHTML += postBlock;
+          
 
           getMutualFollowersText(post.uid, text => {
             const el = document.getElementById("mutual-" + postId);
@@ -926,13 +1068,17 @@ function searchHashtag(tag) {
   searchPosts();
 }
 
-    function toggleLike(postId) {
-      const ref = db.ref(`likes/${postId}/${currentUser.uid}`);
-      ref.once("value", snap => {
-        if (snap.exists()) ref.remove();
-        else ref.set(true);
-      });
+function toggleLike(postId) {
+  const ref = db.ref(`likes/${postId}/${currentUser.uid}`);
+  ref.once("value", snap => {
+    if (snap.exists()) {
+      ref.remove().then(loadPosts); // 👈 reload after unlike
+    } else {
+      ref.set(true).then(loadPosts); // 👈 reload after like
     }
+  });
+}
+
   
     function uploadStory() {
       const file = document.getElementById("storyFile").files[0];
@@ -1350,6 +1496,14 @@ function enableSwipeCarousel() {
     });
   });
 }
+function openGroupApp() {
+  document.getElementById("groupAppScreen").style.display = "block";
+}
+
+function closeGroupApp() {
+  document.getElementById("groupAppScreen").style.display = "none";
+}
+
 function autoScrollCarousels() {
   document.querySelectorAll(".post-carousel").forEach(carousel => {
     let scrollPos = 0;
@@ -1405,6 +1559,219 @@ function getFollowerBadgeImage(followerCount) {
 
   return "";
 }
+function openMoooods() {
+  document.getElementById("moooodsScreen").style.display = "block";
+  loadMoooods();
+}
+
+function closeMoooods() {
+  document.getElementById("moooodsScreen").style.display = "none";
+  document.getElementById("moooodsContainer").innerHTML = "";
+}
+
+function loadMoooods() {
+  const container = document.getElementById("moooodsContainer");
+  container.innerHTML = "";
+
+  db.ref("posts").once("value", snap => {
+    const posts = snap.val();
+    if (!posts) return;
+
+    Object.entries(posts).reverse().forEach(([id, post]) => {
+      let media = "";
+
+      // Add image media
+      if (Array.isArray(post.imageUrls)) {
+        post.imageUrls.forEach(url => {
+          media += `<img src="${url}" class="mood-media" />`;
+        });
+      }
+
+      // Add video media
+      if (Array.isArray(post.videoUrls)) {
+        post.videoUrls.forEach(url => {
+          media += `<video src="${url}" class="mood-media custom-video" loop playsinline style="cursor:pointer;background:black;"></video>`;
+        });
+      }
+
+      // Fallback imageUrl
+      if (!media && post.imageUrl) {
+        media = `<img src="${post.imageUrl}" class="mood-media" />`;
+      }
+
+      const userPic = post.pic || "https://via.placeholder.com/40?text=👤";
+      const username = post.name || "Unknown";
+
+      // Text-only overlay if no media
+      const textOverlay = (!media && post.text)
+  ? `<div style="
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      color: black;
+      padding: 16px 20px;
+      border-radius: 16px;
+      font-size: 18px;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    ">${formatPostText(post.text)}</div>`
+  : "";
+
+
+      // Build post container
+      container.innerHTML += `
+        <div style="height:100vh;width:100%;scroll-snap-align:start;position:relative;">
+          ${media}
+          <div style="position:absolute;top:15px;left:15px;display:flex;align-items:center;gap:8px;color:white;text-shadow:0 0 5px black;">
+            <img src="${userPic}" style="width:40px;height:40px;border-radius:50%;border:2px solid white;" />
+            <div style="font-weight:bold;">${username}</div>
+          </div>
+          ${textOverlay}
+          <div style="position:absolute;right:15px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:20px;">
+  <span class="mood-like" data-id="${id}" style="font-size:24px;cursor:pointer;">🤍</span>
+  <span class="mood-likes-count" id="likes-count-${id}" style="color:white;font-size:14px;text-shadow:0 0 4px black;">0</span>
+  <span class="mood-comment-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">💬</span>
+  <span class="mood-share-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">🔗</span>
+</div>
+
+        </div>
+      `;
+
+      // Load like count
+      db.ref("likes/" + id).once("value", snap => {
+        const count = snap.numChildren();
+        document.getElementById("likes-count-" + id).innerText = count;
+        if (snap.hasChild(currentUser.uid)) {
+          document.querySelector(`.mood-like[data-id="${id}"]`).textContent = "❤️";
+        }
+      });
+    });
+
+    setTimeout(() => {
+      document.getElementById("moooodsContainer").scrollTo({ top: 0, behavior: 'smooth' });
+      enableCustomVideoControls();
+      enableMoooodLikes();
+      enableMoooodComments();
+    }, 300);
+    setTimeout(() => {
+  document.getElementById("moooodsContainer").scrollTo({ top: 0, behavior: 'smooth' });
+  enableCustomVideoControls();
+  enableMoooodLikes();
+  enableMoooodComments();
+  enableMoooodShare(); // 👈 Add this
+}, 300);
+
+  });
+}
+function formatPostText(text) {
+  return (text || "").replace(/#(\w+)/g, (match, tag) => {
+    return `<span class="hashtag" onclick="searchHashtag('${tag}')">#${tag}</span>`;
+  });
+}
+
+
+
+function enableCustomVideoControls() {
+  const videos = document.querySelectorAll(".custom-video");
+
+  videos.forEach(video => {
+    video.pause();
+    video.addEventListener("click", () => {
+      videos.forEach(v => { if (v !== video) v.pause(); });
+      if (video.paused) {
+        video.play().catch(err => console.warn("Play failed:", err));
+      } else {
+        video.pause();
+      }
+    });
+  });
+}
+
+
+
+function enableMoooodLikes() {
+  document.querySelectorAll(".mood-like").forEach(btn => {
+    const postId = btn.dataset.id;
+
+    btn.addEventListener("click", () => {
+      const ref = db.ref("likes/" + postId + "/" + currentUser.uid);
+      ref.once("value", snap => {
+        if (snap.exists()) {
+          ref.remove().then(() => {
+            btn.textContent = "🤍";
+            updateLikeCount(postId);
+          });
+        } else {
+          ref.set(true).then(() => {
+            btn.textContent = "❤️";
+            updateLikeCount(postId);
+          });
+        }
+      });
+    });
+  });
+}
+
+function updateLikeCount(postId) {
+  db.ref("likes/" + postId).once("value", snap => {
+    const count = snap.numChildren();
+    document.getElementById("likes-count-" + postId).innerText = count;
+  });
+}
+
+function enableMoooodComments() {
+  document.querySelectorAll(".mood-comment-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const postId = btn.dataset.id;
+      openCommentPopup(postId);
+    });
+  });
+}
+function goToFeed() {
+  document.getElementById("feed").style.display = "block";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("moooodsScreen").style.display = "none";
+}
+
+// 👈 Declare this first!
+let currentSharePostId = null;
+
+function enableMoooodShare() {
+  document.querySelectorAll(".mood-share-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const postId = btn.dataset.id;
+      const link = `${location.origin}?post=${postId}`;
+
+      navigator.clipboard.writeText(link).then(() => {
+        alert("Link copied!");
+      }).catch(() => {
+        alert("Copy failed.");
+      });
+    });
+  });
+}
+
+
+function closeSharePopup() {
+  const popup = document.getElementById("sharePopup");
+  popup.classList.remove("show");
+}
+
+function copyShareLink() {
+  if (!currentSharePostId) return;
+  const link = `${location.origin}?post=${currentSharePostId}`;
+  navigator.clipboard.writeText(link).then(() => {
+    alert("Link copied!");
+    closeSharePopup();
+  });
+}
+
+setTimeout(enableMoooodShare, 500);
+
+
 
 
   </script>
