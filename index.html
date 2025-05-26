@@ -14,6 +14,55 @@
     #moooodsContainer > div {
   scroll-snap-align: start;
 }
+.story-upload {
+  background: white;
+  padding: 16px;
+  margin: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  max-width: 500px;
+  margin-inline: auto;
+}
+
+.story-upload h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.story-upload input[type="file"] {
+  margin: 8px 0;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.story-upload input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.story-upload button {
+  width: 100%;
+  padding: 12px;
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.story-upload button:hover {
+  background-color: #145ddc;
+}
 
     .comment-popup {
     display: none;
@@ -204,6 +253,53 @@ body {
   width: 90%;
   max-width: 400px;
 }
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 9998;
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 400px;
+  display: none;
+  z-index: 9999;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.popup.show {
+  display: block;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.popup input, .popup button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.popup button {
+  background: #1877f2;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
 
 /* Scrollable rings and stories */
 .rings, .stories {
@@ -236,6 +332,103 @@ n
   max-width: 100%;
   border-radius: 10px;
   scroll-behavior: smooth;
+}
+.story-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 9999;
+  width: 90%;
+  max-width: 360px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  display: none;
+  flex-direction: column;
+  padding: 0;
+  animation: popupSlideIn 0.3s ease;
+}
+
+@keyframes popupSlideIn {
+  from { transform: translate(-50%, -60%) scale(0.95); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.preview {
+  background: #000;
+  height: 300px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.preview img,
+.preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+}
+
+.caption-overlay {
+  position: relative;
+  z-index: 2;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 8px 12px;
+  margin: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  max-width: 80%;
+  text-align: center;
+}
+
+.story-popup input[type="file"],
+.story-popup input[type="text"] {
+  width: 90%;
+  margin: 12px auto;
+  display: block;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.story-popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+}
+
+.story-popup-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #1877f2;
+  color: white;
+}
+
+.story-popup-buttons .cancel {
+  background: #ccc;
+  color: black;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 9998;
 }
 
 .post-carousel img {
@@ -346,6 +539,40 @@ n
 .meta strong {
   display: flex;
   align-items: center;
+}
+.story-viewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.story-viewer video,
+.story-viewer img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.story-caption {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 16px;
+  max-width: 80%;
+  text-align: center;
 }
 
 .meta strong img.verified-icon {
@@ -678,7 +905,7 @@ input[type="file"]::file-selector-button:hover {
     <input id="postInput" placeholder="What's on your mind?" type="text">
     
     <input type="file" id="postImage" accept="image/*,video/*" multiple onchange="validateImageLimit(this)">
-
+    
     <script>
     function validateImageLimit(input) {
       if (input.files.length > 10) {
@@ -688,7 +915,25 @@ input[type="file"]::file-selector-button:hover {
     }
     </script>
 
- 
+<button onclick="openStoryPopup()" style="margin: 10px; padding: 10px 20px; background: #1877f2; color: white; border: none; border-radius: 8px; font-weight: bold;">+ Add Story</button>
+
+<div id="storyPopupOverlay" class="overlay" onclick="closeStoryPopup()"></div>
+
+<div id="storyPopup" class="story-popup">
+  <div class="preview" id="storyPreview">
+    <span class="caption-overlay" id="previewCaption"></span>
+  </div>
+  
+  <input type="file" id="storyFile" accept="image/*,video/*" onchange="previewStoryMedia(event)">
+  <input type="text" id="storyOverlay" placeholder="Write a caption..." oninput="updateCaptionPreview()">
+  
+  <div class="story-popup-buttons">
+    <button onclick="uploadStory()">Upload</button>
+    <button onclick="closeStoryPopup()" class="cancel">Cancel</button>
+  </div>
+</div>
+
+
 
     <button onclick="createPost()">Post</button>
   </div>
@@ -747,7 +992,37 @@ input[type="file"]::file-selector-button:hover {
     <button onclick="postComment()" style="padding:8px;">Post</button>
     <button onclick="closeCommentPopup()" style="float:right;">✖</button>
   </div>
+  <!-- Notifications Icon and Popup -->
+  <div id="storyViewerOverlay" class="overlay" onclick="closeStoryViewer()"></div>
+  <div id="storyViewer" class="story-viewer">
+    <div id="storyMediaWrapper"></div>
+    <div id="storyCaption" class="story-caption"></div>
+  </div>
   
+  <button onclick="showNotifications()" style="position:fixed;bottom:70px;left:10px;z-index:9999;font-size:24px;background:none;border:none;cursor:pointer;">
+    🔔
+  </button>
+  
+<div id="notifBox" style="
+  display:none;
+  position:fixed;
+  top:50px;
+  right:10px;
+  width:280px;
+  max-height:400px;
+  overflow-y:auto;
+  background:white;
+  border-radius:10px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.3);
+  padding:10px;
+  z-index:9999;
+  font-family:sans-serif;
+">
+  <strong style="font-size:18px;">Notifications</strong>
+  <hr style="margin:8px 0;">
+  <div id="notifContent">Loading...</div>
+</div>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -970,6 +1245,8 @@ feed.innerHTML += postBlock;
 
           setTimeout(() => enableSwipeCarousel(), 50);
         });
+        cleanupOldStories();
+
       });
     });
   });
@@ -1069,15 +1346,38 @@ function searchHashtag(tag) {
 }
 
 function toggleLike(postId) {
-  const ref = db.ref(`likes/${postId}/${currentUser.uid}`);
-  ref.once("value", snap => {
+  const ref = db.ref("likes/" + postId + "/" + currentUser.uid);
+
+  ref.once("value").then(snap => {
     if (snap.exists()) {
-      ref.remove().then(loadPosts); // 👈 reload after unlike
+      // Unlike
+      ref.remove().then(() => {
+        updateLikeCount(postId);
+        loadPosts(); // Optional: refresh UI
+      });
     } else {
-      ref.set(true).then(loadPosts); // 👈 reload after like
+      // Like
+      ref.set(true).then(() => {
+        db.ref("posts/" + postId).once("value").then(postSnap => {
+          const post = postSnap.val();
+          if (post && post.uid !== currentUser.uid) {
+            db.ref("notifications/" + post.uid).push({
+              type: "like",
+              from: currentUser.uid,
+              postId,
+              timestamp: Date.now()
+            });
+          }
+        });
+        updateLikeCount(postId);
+        loadPosts(); // Optional
+      });
     }
   });
 }
+
+
+
 
   
     function uploadStory() {
@@ -1233,17 +1533,27 @@ if (file) {
     }
   
     function toggleFollow() {
-      const ref = db.ref("follows/" + currentUser.uid + "/" + viewingUID);
-      ref.once("value", snap => {
-        if (snap.exists()) {
-          ref.remove();
-          document.getElementById("followBtn").innerText = "Follow";
-        } else {
-          ref.set(true);
-          document.getElementById("followBtn").innerText = "Unfollow";
-        }
+  const ref = db.ref("follows/" + currentUser.uid + "/" + viewingUID);
+
+  ref.once("value", snap => {
+    if (snap.exists()) {
+      // Unfollow
+      ref.remove();
+      document.getElementById("followBtn").innerText = "Follow";
+    } else {
+      // Follow
+      ref.set(true).then(() => {
+        document.getElementById("followBtn").innerText = "Unfollow";
+        db.ref("notifications/" + viewingUID).push({
+          type: "follow",
+          from: currentUser.uid,
+          timestamp: Date.now()
+        });
       });
     }
+  });
+}
+
   
     function closeProfile() {
       document.getElementById("profilePage").style.display = "none";
@@ -1562,14 +1872,19 @@ function getFollowerBadgeImage(followerCount) {
 function openMoooods() {
   document.getElementById("moooodsScreen").style.display = "block";
   loadMoooods();
+
+  setTimeout(() => {
+    scrollToSharedMooood();
+  }, 600); // let DOM render
 }
+
 
 function closeMoooods() {
   document.getElementById("moooodsScreen").style.display = "none";
   document.getElementById("moooodsContainer").innerHTML = "";
 }
 
-function loadMoooods() {
+function loadMoooods(callback = () => {}) {
   const container = document.getElementById("moooodsContainer");
   container.innerHTML = "";
 
@@ -1580,21 +1895,18 @@ function loadMoooods() {
     Object.entries(posts).reverse().forEach(([id, post]) => {
       let media = "";
 
-      // Add image media
       if (Array.isArray(post.imageUrls)) {
         post.imageUrls.forEach(url => {
           media += `<img src="${url}" class="mood-media" />`;
         });
       }
 
-      // Add video media
       if (Array.isArray(post.videoUrls)) {
         post.videoUrls.forEach(url => {
-          media += `<video src="${url}" class="mood-media custom-video" loop playsinline style="cursor:pointer;background:black;"></video>`;
+          media += `<video src="${url}" class="mood-media custom-video" loop playsinline></video>`;
         });
       }
 
-      // Fallback imageUrl
       if (!media && post.imageUrl) {
         media = `<img src="${post.imageUrl}" class="mood-media" />`;
       }
@@ -1602,28 +1914,12 @@ function loadMoooods() {
       const userPic = post.pic || "https://via.placeholder.com/40?text=👤";
       const username = post.name || "Unknown";
 
-      // Text-only overlay if no media
       const textOverlay = (!media && post.text)
-  ? `<div style="
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      color: black;
-      padding: 16px 20px;
-      border-radius: 16px;
-      font-size: 18px;
-      max-width: 90%;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    ">${formatPostText(post.text)}</div>`
-  : "";
+        ? `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 16px 20px; border-radius: 16px; font-size: 18px; max-width: 90%; text-align: center;">${formatPostText(post.text)}</div>`
+        : "";
 
-
-      // Build post container
       container.innerHTML += `
-        <div style="height:100vh;width:100%;scroll-snap-align:start;position:relative;">
+        <div id="mooood-${id}" style="height:100vh;width:100%;scroll-snap-align:start;position:relative;">
           ${media}
           <div style="position:absolute;top:15px;left:15px;display:flex;align-items:center;gap:8px;color:white;text-shadow:0 0 5px black;">
             <img src="${userPic}" style="width:40px;height:40px;border-radius:50%;border:2px solid white;" />
@@ -1631,16 +1927,14 @@ function loadMoooods() {
           </div>
           ${textOverlay}
           <div style="position:absolute;right:15px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:20px;">
-  <span class="mood-like" data-id="${id}" style="font-size:24px;cursor:pointer;">🤍</span>
-  <span class="mood-likes-count" id="likes-count-${id}" style="color:white;font-size:14px;text-shadow:0 0 4px black;">0</span>
-  <span class="mood-comment-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">💬</span>
-  <span class="mood-share-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">🔗</span>
-</div>
-
+            <span class="mood-like" data-id="${id}" style="font-size:24px;cursor:pointer;">🤍</span>
+            <span class="mood-likes-count" id="likes-count-${id}" style="color:white;font-size:14px;text-shadow:0 0 4px black;">0</span>
+            <span class="mood-comment-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">💬</span>
+            <span class="mood-share-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">🔗</span>
+          </div>
         </div>
       `;
 
-      // Load like count
       db.ref("likes/" + id).once("value", snap => {
         const count = snap.numChildren();
         document.getElementById("likes-count-" + id).innerText = count;
@@ -1651,21 +1945,27 @@ function loadMoooods() {
     });
 
     setTimeout(() => {
-      document.getElementById("moooodsContainer").scrollTo({ top: 0, behavior: 'smooth' });
       enableCustomVideoControls();
       enableMoooodLikes();
       enableMoooodComments();
+      enableMoooodShare();
+      callback(); // 👈 invoke callback after rendering
     }, 300);
-    setTimeout(() => {
-  document.getElementById("moooodsContainer").scrollTo({ top: 0, behavior: 'smooth' });
-  enableCustomVideoControls();
-  enableMoooodLikes();
-  enableMoooodComments();
-  enableMoooodShare(); // 👈 Add this
-}, 300);
-
   });
 }
+
+function scrollToSharedMooood() {
+  const hash = window.location.hash;
+  if (hash.startsWith("#mooood-")) {
+    const targetId = hash.replace("#", "");
+    const target = document.getElementById(targetId);
+    if (target) {
+      document.getElementById("moooodsScreen").style.display = "block";
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+}
+
 function formatPostText(text) {
   return (text || "").replace(/#(\w+)/g, (match, tag) => {
     return `<span class="hashtag" onclick="searchHashtag('${tag}')">#${tag}</span>`;
@@ -1738,21 +2038,33 @@ function goToFeed() {
 
 // 👈 Declare this first!
 let currentSharePostId = null;
-
 function enableMoooodShare() {
   document.querySelectorAll(".mood-share-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const postId = btn.dataset.id;
-      const link = `${location.origin}?post=${postId}`;
+      const link = `${location.origin}#mooood-${postId}`;
 
       navigator.clipboard.writeText(link).then(() => {
         alert("Link copied!");
-      }).catch(() => {
-        alert("Copy failed.");
+
+        // 👇 Go to Moooods screen and scroll to post
+        document.getElementById("moooodsScreen").style.display = "block";
+
+        // Wait for Moooods to load, then scroll
+        loadMoooods(() => {
+          const target = document.getElementById(`mooood-${postId}`);
+          if (target) {
+            setTimeout(() => {
+              target.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 400);
+          }
+        });
       });
     });
   });
 }
+
+
 
 
 function closeSharePopup() {
@@ -1771,8 +2083,253 @@ function copyShareLink() {
 
 setTimeout(enableMoooodShare, 500);
 
+function scrollToSharedMooood() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith("#mooood-")) {
+    const id = hash.replace("#mooood-", "");
+    const target = document.getElementById("mooood-" + id);
+    if (target) {
+      document.getElementById("moooodsScreen").style.display = "block";
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+}
 
+// Run after Moooods are loaded
+setTimeout(() => {
+  loadMoooods();
+  setTimeout(scrollToSharedMooood, 500);
+}, 500);
 
+function showNotifications() {
+  const box = document.getElementById("notifBox");
+  const content = document.getElementById("notifContent");
+
+  box.style.display = box.style.display === "block" ? "none" : "block";
+  content.innerHTML = "Loading...";
+
+  db.ref("notifications/" + currentUser.uid)
+    .orderByChild("timestamp")
+    .limitToLast(20)
+    .once("value", snap => {
+      const data = snap.val();
+      if (!data) return content.innerHTML = "<p>No notifications yet.</p>";
+
+      content.innerHTML = "";
+      const items = Object.entries(data).reverse();
+
+      items.forEach(([id, notif]) => {
+        let message = "";
+        if (notif.type === "like") {
+          message = `❤️ Someone liked your post.`;
+        } else if (notif.type === "follow") {
+          message = `➕ Someone followed you.`;
+        }
+
+        content.innerHTML += `<div style="margin-bottom:8px;font-size:14px;">${message}</div>`;
+      });
+    });
+}
+
+function uploadStory() {
+  const file = document.getElementById("storyFile").files[0];
+  const overlay = document.getElementById("storyOverlay").value;
+
+  if (!file) return alert("Choose a file first!");
+
+  const fileType = file.type.startsWith("video/") ? "video" : "image";
+  const ref = storage.ref("stories/" + Date.now() + "_" + file.name);
+
+  ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+    db.ref("users/" + currentUser.uid).once("value", snap => {
+      const user = snap.val() || {};
+      db.ref("times/" + currentUser.uid).set({
+        media: url,
+        type: fileType,
+        overlay,
+        timestamp: Date.now(),
+        name: user.name || "You",
+        pic: user.pic || "https://via.placeholder.com/60?text=👤"
+      }).then(() => {
+        alert("Story uploaded!");
+        document.getElementById("storyFile").value = "";
+        document.getElementById("storyOverlay").value = "";
+        loadStories();
+        loadStoryRings();
+      });
+    });
+  }).catch(err => {
+    alert("Upload failed: " + err.message);
+  });
+}
+
+function loadStoryRings() {
+  db.ref("follows/" + currentUser.uid).once("value", snap => {
+    const following = snap.val() || {};
+    db.ref("users").once("value", userSnap => {
+      const allUsers = userSnap.val() || {};
+      const rings = document.getElementById("storyRings");
+      rings.innerHTML = "";
+
+      Object.keys(following).forEach((uid, i) => {
+        const user = allUsers[uid];
+        if (!user) return;
+        const ringPic = user.pic || "https://via.placeholder.com/60?text=👤";
+        rings.innerHTML += `
+          <div class="story-ring blue" onclick="viewStory('${uid}')">
+            <img src="${ringPic}">
+          </div>`;
+      });
+    });
+  });
+}
+function viewStory(uid) {
+  db.ref("times/" + uid).once("value", snap => {
+    const story = snap.val();
+    if (!story) return;
+
+    if (uid !== currentUser.uid) {
+      db.ref("times/" + uid + "/viewers/" + currentUser.uid).set(true);
+    }
+
+    const mediaTag = story.type === "video"
+      ? `<video src="${story.media}" autoplay controls style="width:100%"></video>`
+      : `<img src="${story.media}" style="width:100%">`;
+
+    const overlay = story.overlay || "";
+
+    const win = window.open("", "_blank");
+    win.document.write(`${mediaTag}<p>${overlay}</p>`);
+  });
+}
+function cleanupOldStories() {
+  const now = Date.now();
+  db.ref("times").once("value", snap => {
+    const stories = snap.val();
+    if (!stories) return;
+
+    Object.entries(stories).forEach(([uid, story]) => {
+      if (story.timestamp && now - story.timestamp > 24 * 60 * 60 * 1000) {
+        db.ref("times/" + uid).remove();
+      }
+    });
+  });
+}
+function openStoryPopup() {
+  document.getElementById("storyPopup").classList.add("show");
+  document.getElementById("storyPopupOverlay").style.display = "block";
+}
+
+function closeStoryPopup() {
+  document.getElementById("storyPopup").classList.remove("show");
+  document.getElementById("storyPopupOverlay").style.display = "none";
+}function openStoryPopup() {
+  document.getElementById("storyPopup").style.display = "flex";
+  document.getElementById("storyPopupOverlay").style.display = "block";
+}
+
+function closeStoryPopup() {
+  document.getElementById("storyPopup").style.display = "none";
+  document.getElementById("storyPopupOverlay").style.display = "none";
+  document.getElementById("storyPreview").innerHTML = "";
+  document.getElementById("previewCaption").innerText = "";
+}
+
+function previewStoryMedia(event) {
+  const file = event.target.files[0];
+  const preview = document.getElementById("storyPreview");
+  preview.innerHTML = "";
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  const isVideo = file.type.startsWith("video/");
+  const element = isVideo
+    ? `<video src="${url}" autoplay muted loop playsinline></video>`
+    : `<img src="${url}" />`;
+  preview.innerHTML = element + `<span class="caption-overlay" id="previewCaption"></span>`;
+}
+
+function updateCaptionPreview() {
+  document.getElementById("previewCaption").innerText = document.getElementById("storyOverlay").value;
+}
+function showTime(url, type, overlay, ownerUid) {
+  if (ownerUid && currentUser.uid !== ownerUid) {
+    db.ref(`times/${ownerUid}/viewers/${currentUser.uid}`).set(true);
+  }
+
+  const wrapper = document.getElementById("storyMediaWrapper");
+  const caption = document.getElementById("storyCaption");
+
+  wrapper.innerHTML = type === "video"
+    ? `<video src="${url}" autoplay muted controls playsinline style="max-height: 100%; max-width: 100%;"></video>`
+    : `<img src="${url}" style="max-height: 100%; max-width: 100%;">`;
+
+  caption.innerText = overlay || "";
+
+  document.getElementById("storyViewer").style.display = "flex";
+  document.getElementById("storyViewerOverlay").style.display = "block";
+}
+
+// Full logic for story viewing with double-click navigation between users
+
+let allStories = []; // [ [uid, storyData], ... ]
+let currentUserIndex = 0;
+
+// Load and sort stories
+function loadStoriesForViewer() {
+  db.ref("times").once("value", snap => {
+    const times = snap.val() || {};
+    allStories = Object.entries(times).sort((a, b) => b[1].timestamp - a[1].timestamp);
+  });
+}
+
+// Show specific story by index
+function showTimeByIndex(userIdx) {
+  if (!allStories[userIdx]) return;
+
+  currentUserIndex = userIdx;
+
+  const [uid, story] = allStories[userIdx];
+  const url = story.media;
+  const type = story.type;
+  const overlay = story.overlay;
+
+  if (uid && currentUser.uid !== uid) {
+    db.ref(`times/${uid}/viewers/${currentUser.uid}`).set(true);
+  }
+
+  const wrapper = document.getElementById("storyMediaWrapper");
+  const caption = document.getElementById("storyCaption");
+
+  wrapper.innerHTML = type === "video"
+    ? `<video src="${url}" autoplay muted controls playsinline style="max-height: 100%; max-width: 100%;"></video>`
+    : `<img src="${url}" style="max-height: 100%; max-width: 100%;">`;
+
+  caption.innerText = overlay || "";
+
+  document.getElementById("storyViewer").style.display = "flex";
+  document.getElementById("storyViewerOverlay").style.display = "block";
+}
+
+// Close viewer
+function closeStoryViewer() {
+  document.getElementById("storyViewer").style.display = "none";
+  document.getElementById("storyViewerOverlay").style.display = "none";
+  document.getElementById("storyMediaWrapper").innerHTML = "";
+  document.getElementById("storyCaption").innerText = "";
+}
+
+// Handle double-tap to go next
+function setupStoryViewerDblClick() {
+  document.getElementById("storyViewer").addEventListener("dblclick", () => {
+    currentUserIndex++;
+    if (currentUserIndex < allStories.length) {
+      showTimeByIndex(currentUserIndex);
+    } else {
+      closeStoryViewer();
+    }
+  });
+}
 
   </script>
   
