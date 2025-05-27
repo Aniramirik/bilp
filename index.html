@@ -849,6 +849,16 @@ input[type="file"]::file-selector-button:hover {
   color: red;
   font-size: 18px;
 }
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
 
   </style>
 </head>
@@ -983,6 +993,11 @@ input[type="file"]::file-selector-button:hover {
     <p style="margin-bottom: 15px; font-weight: bold;">Share this post</p>
     <button onclick="copyShareLink()" style="padding:10px 20px; background:#1877f2; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Copy Link</button>
     <button onclick="closeSharePopup()" style="margin-top:10px; display:block; background:none; border:none; color:#555; cursor:pointer;">Cancel</button>
+  </div>
+  <div id="youtubeSearchSection" style="display:none; padding: 10px; background: white;">
+    <input type="text" id="youtubeSearchInput" placeholder="Search a song or artist..." style="width:80%; padding:8px;">
+    <button onclick="searchYouTube()">Search</button>
+    <div id="youtubeResults" style="margin-top:10px;"></div>
   </div>
   
   
@@ -1927,10 +1942,13 @@ function loadMoooods(callback = () => {}) {
           </div>
           ${textOverlay}
           <div style="position:absolute;right:15px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:20px;">
-            <span class="mood-like" data-id="${id}" style="font-size:24px;cursor:pointer;">🤍</span>
-            <span class="mood-likes-count" id="likes-count-${id}" style="color:white;font-size:14px;text-shadow:0 0 4px black;">0</span>
-            <span class="mood-comment-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">💬</span>
-            <span class="mood-share-btn" data-id="${id}" style="font-size:24px;cursor:pointer;">🔗</span>
+            <div style="position:absolute;right:15px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:20px;">
+  <img src="Group 1469.png" class="mood-like" data-id="${id}" style="width:30px;cursor:pointer;">
+  <span class="mood-likes-count" id="likes-count-${id}" style="color:white;font-size:14px;text-shadow:0 0 4px black;">0</span>
+  <img src="Group 1472.png" class="mood-comment-btn" data-id="${id}" style="width:30px;cursor:pointer;">
+  <img src="Group 1473.png" class="mood-share-btn" data-id="${id}" style="width:30px;cursor:pointer;">
+</div>
+
           </div>
         </div>
       `;
@@ -2001,12 +2019,14 @@ function enableMoooodLikes() {
       ref.once("value", snap => {
         if (snap.exists()) {
           ref.remove().then(() => {
-            btn.textContent = "🤍";
+            btn.src = "Group 1471.png";
+
             updateLikeCount(postId);
           });
         } else {
           ref.set(true).then(() => {
-            btn.textContent = "❤️";
+            btn.src = "Group 1469.png";
+
             updateLikeCount(postId);
           });
         }
